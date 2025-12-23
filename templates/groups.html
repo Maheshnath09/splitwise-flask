@@ -1,0 +1,58 @@
+<!-- templates/groups.html -->
+{% extends "base.html" %}
+
+{% block title %}Groups - Splitwise Clone{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Groups</h1>
+        <a href="{{ url_for('create_group') }}" 
+           class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            Create a group
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Your Groups</h2>
+        </div>
+        {% if groups %}
+            <ul class="divide-y divide-gray-200">
+                {% for group in groups %}
+                    <li class="hover:bg-gray-50">
+                        <a href="{{ url_for('view_group', group_id=group.id) }}" class="block px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="bg-green-100 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                        <span class="text-green-600 font-semibold">{{ group.name[0]|upper }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{ group.name }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            {{ group.members|length }} member{% if group.members|length != 1 %}s{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-gray-400">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="p-6 text-center text-gray-500">
+                <p>You're not in any groups yet.</p>
+                <p class="mt-2">Create a group to start sharing expenses with friends!</p>
+                <a href="{{ url_for('create_group') }}" class="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    Create your first group
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

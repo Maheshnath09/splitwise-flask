@@ -1,0 +1,80 @@
+<!-- templates/friends.html -->
+{% extends "base.html" %}
+
+{% block title %}Friends - Splitwise Clone{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Friends</h1>
+        <a href="{{ url_for('dashboard') }}" 
+           class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- In friends.html, update the non-friends section -->
+<div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Add a friend</h2>
+    {% if non_friends %}
+        <div class="space-y-4">
+            {% for user in non_friends %}
+                <div class="flex items-center justify-between p-3 bg-white rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                            <span class="text-gray-600 font-semibold">{{ user.username[0]|upper }}</span>
+                        </div>
+                        <span class="text-gray-900">{{ user.username }}</span>
+                    </div>
+                    <form method="POST" action="{{ url_for('add_friend', friend_id=user.id) }}">
+                        <button type="submit" 
+                                class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                            Add Friend
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500">No more users to add as friends.</p>
+    {% endif %}
+</div>
+
+
+    <!-- Friends List -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Your Friends</h2>
+        </div>
+        {% if friends %}
+            <ul class="divide-y divide-gray-200">
+                {% for friend in friends %}
+                    <li class="px-6 py-4 hover:bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                    <span class="text-green-600 font-semibold">{{ friend.username[0]|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ friend.username }}</p>
+                                    <p class="text-sm text-gray-500">{{ friend.email }}</p>
+                                </div>
+                            </div>
+                            <form method="POST" action="{{ url_for('remove_friend', friend_id=friend.id) }}">
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="p-6 text-center text-gray-500">
+                <p>You haven't added any friends yet.</p>
+                <p class="mt-2">Add friends to start splitting expenses!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

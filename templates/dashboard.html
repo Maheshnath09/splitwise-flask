@@ -1,0 +1,125 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Splitwise Clone{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Balance Summary -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Balances</h2>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            {% if balances %}
+                <ul class="divide-y divide-gray-200">
+                    {% for friend, amount in balances.items() %}
+                        <li class="px-6 py-4 flex justify-between items-center hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                    <span class="text-green-600 font-semibold">{{ friend.username[0]|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ friend.username }}</p>
+                                    <p class="text-sm text-gray-500">{% if amount > 0 %}owes you{% else %}you owe{% endif %}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium {% if amount > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if amount > 0 %}+{% endif %}{{ "%.2f"|format(amount) }}
+                                </p>
+                                <form method="POST" action="{{ url_for('settle_up') }}" class="inline">
+                                    <input type="hidden" name="friend_id" value="{{ friend.id }}">
+                                    <button type="submit" class="text-xs text-green-600 hover:underline">Settle up</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="p-6 text-center text-gray-500">
+                    <p>You're all settled up!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Recent Activity</h2>
+            <a href="{{ url_for('add_expense') }}" class="text-sm text-green-600 hover:underline">Add an expense</a>
+        </div>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            {% if recent_activity %}
+                <ul class="divide-y divide-gray-200">
+                    {% for expense in recent_activity %}
+                        <li class="px-6 py-4 hover:bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="bg-green-100 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                        <span class="text-green-600 font-semibold">₹</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{ expense.description }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            {{ expense.date.strftime('%b %d, %Y') }} • 
+                                            {% if expense.payer_id == current_user.id %}
+                                                You paid
+                                            {% else %}
+                                                {{ expense.payer.username }} paid
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-gray-900">₹{{ "%.2f"|format(expense.amount) }}</p>
+                                    {% if expense.payer_id != current_user.id %}
+                                        <form method="POST" action="{{ url_for('settle_up') }}" class="inline">
+                                            <input type="hidden" name="expense_id" value="{{ expense.id }}">
+                                            <button type="submit" class="text-xs text-green-600 hover:underline">Settle up</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="p-6 text-center text-gray-500">
+                    <p>No recent activity. Add an expense to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Your Groups -->
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Your Groups</h2>
+            <a href="{{ url_for('create_group') }}" class="text-sm text-green-600 hover:underline">Create a group</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for group in groups %}
+                <a href="{{ url_for('view_group', group_id=group.id) }}" 
+                   class="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                            <span class="text-green-600 font-semibold">{{ group.name[0]|upper }}</span>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-900">{{ group.name }}</h3>
+                            <p class="text-sm text-gray-500">
+                                {{ group.members|length }} member{% if group.members|length != 1 %}s{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <div class="col-span-full text-center py-8 text-gray-500">
+                    <p>You're not in any groups yet.</p>
+                    <a href="{{ url_for('create_group') }}" class="text-green-600 hover:underline">Create your first group</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

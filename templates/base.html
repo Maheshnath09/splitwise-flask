@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Splitwise Clone{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<style>
+    /* Make checkboxes more visible */
+    input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+    }
+    input[type="checkbox"]:checked {
+        background-color: #059669; /* green-600 */
+        border-color: #059669;
+    }
+</style>
+
+
+<body class="bg-gray-100">
+<!-- templates/base.html -->
+<!-- Add these navigation items to the navigation bar -->
+<nav class="bg-green-600 text-white p-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{{ url_for('index') }}" class="text-2xl font-bold">Splitwise</a>
+        <div class="flex items-center space-x-4">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="hover:underline">Dashboard</a>
+                <a href="{{ url_for('friends') }}" class="hover:underline">Friends</a>
+                <a href="{{ url_for('groups') }}" class="hover:underline">Groups</a>
+                <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="hover:underline">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:underline">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav> 
+
+    <div class="container mx-auto p-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
